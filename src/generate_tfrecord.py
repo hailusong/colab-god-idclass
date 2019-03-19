@@ -23,11 +23,14 @@ from PIL import Image
 from object_detection.utils import dataset_util
 from collections import namedtuple, OrderedDict
 
+
 def del_all_flags(FLAGS):
     flags_dict = FLAGS._flags()
     keys_list = [keys for keys in flags_dict]
     for keys in keys_list:
+        print(f'removing attribute {keys}')
         FLAGS.__delattr__(keys)
+
 
 # if running inside IPython notebook, the python session will be maintained across
 # cells, so does the tf.app.flags. That will cause flags defined twice error
