@@ -23,8 +23,18 @@ from PIL import Image
 from object_detection.utils import dataset_util
 from collections import namedtuple, OrderedDict
 
-tf.reset_default_graph()
+def del_all_flags(FLAGS):
+    flags_dict = FLAGS._flags()
+    keys_list = [keys for keys in flags_dict]
+    for keys in keys_list:
+        FLAGS.__delattr__(keys)
+
+# if running inside IPython notebook, the python session will be maintained across
+# cells, so does the tf.app.flags. That will cause flags defined twice error
+# if we %run the app multiple times. The workaroud is to always clean up
+# the flags before defining them.
 flags = tf.app.flags
+del_all_flags(flags.FLAGS)
 flags.DEFINE_string('csv_input', '', 'Path to the CSV input')
 flags.DEFINE_string('output_path', '', 'Path to output TFRecord')
 flags.DEFINE_string('image_dir', '', 'Path to images')
