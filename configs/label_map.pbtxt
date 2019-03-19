@@ -1,0 +1,14 @@
+item {
+  id: 1
+  name: 'ON-DL'
+}
+
+item {
+  id: 2
+  name: 'ON-HC'
+}
+
+item {
+  id: 3
+  name: 'UNKNOWN'
+}
