@@ -23,6 +23,7 @@ from PIL import Image
 from object_detection.utils import dataset_util
 from collections import namedtuple, OrderedDict
 
+tf.reset_default_graph()
 flags = tf.app.flags
 flags.DEFINE_string('csv_input', '', 'Path to the CSV input')
 flags.DEFINE_string('output_path', '', 'Path to output TFRecord')
