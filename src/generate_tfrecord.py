@@ -107,6 +107,7 @@ def main(_):
     writer = tf.python_io.TFRecordWriter(FLAGS.output_path)
     path = os.path.join(FLAGS.image_dir)
     examples = pd.read_csv(FLAGS.csv_input)
+    print(f'total number of rows read is {examples.shape[0]}')
     grouped = split(examples, 'filename')
     for group in grouped:
         tf_example = create_tf_example(group, path)
