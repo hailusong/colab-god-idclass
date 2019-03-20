@@ -43,6 +43,7 @@ flags.DEFINE_string('output_path', '', 'Path to output TFRecord')
 flags.DEFINE_string('image_dir', '', 'Path to images')
 FLAGS = flags.FLAGS
 
+# this should be synced with the label_map.pbtxt
 LABEL_MAP = {
     "BACKGROUND": 0,
     "ON-DL": 1,
@@ -78,11 +79,26 @@ def create_tf_example(group, path):
     classes_text = []
     classes = []
 
+    valid_range_min = -0.1
+    valid_range_max = 1.1
+
     for index, row in group.object.iterrows():
+        x1 = row['bbox1_x1'] / width
+        x2 = row['bbox1_x2'] / width
+        y1 = row['bbox1_y1'] / height
+        y2 = row['bbox1_y2'] / height
+        valid_rec = (valid_range_min < x1 <  valid_range_max and
+                     valid_range_min < x2 <  valid_range_max and
+                     valid_range_min < y1 <  valid_range_max and
+                     valid_range_min < y2 <  valid_range_max)
+        if not valid_rec:
+            print(f'{x1}, {y1} - {x2}, {y2} is not completely valid bbox. Ignored')
+            continue
+
         xmins.append(row['bbox1_x1'] / width)
         xmaxs.append(row['bbox1_x2'] / width)
         ymins.append(row['bbox1_y1'] / height)
-        ymaxs.append(row['bbox1_x2'] / height)
+        ymaxs.append(row['bbox1_y2'] / height)
         classes_text.append(row['label'].encode('utf8'))
         classes.append(class_text_to_int(row['label']))
 
