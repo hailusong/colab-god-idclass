@@ -81,6 +81,7 @@ def create_tf_example(group, path):
 
     valid_range_min = -0.1
     valid_range_max = 1.1
+    invalid_cnt = 0
 
     for index, row in group.object.iterrows():
         x1 = row['bbox1_x1'] / width
@@ -93,6 +94,7 @@ def create_tf_example(group, path):
                      valid_range_min < y2 <  valid_range_max)
         if not valid_rec:
             print(f'{x1}, {y1} - {x2}, {y2} is not completely valid bbox. Ignored')
+            invalid_cnt += 1
             continue
 
         xmins.append(row['bbox1_x1'] / width)
@@ -101,6 +103,8 @@ def create_tf_example(group, path):
         ymaxs.append(row['bbox1_y2'] / height)
         classes_text.append(row['label'].encode('utf8'))
         classes.append(class_text_to_int(row['label']))
+
+    print(f'total invalid record count is {invalid_cnt}')
 
     tf_example = tf.train.Example(features=tf.train.Features(feature={
         'image/height': dataset_util.int64_feature(height),
