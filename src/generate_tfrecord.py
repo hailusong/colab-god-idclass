@@ -103,6 +103,11 @@ def show_image(img:PIL.Image, ax:plt.Axes=None, figsize:tuple=(3,3), hide_axis:b
     return ax
 
 
+def bb2hw(a:Collection[int])->np.ndarray:
+    "Convert bounding box points from (width,height,center) to (height,width,top,left)."
+    return np.array([a[1],a[0],a[3]-a[1],a[2]-a[0]])
+
+
 def show_bbox(y=None, ax:plt.Axes=None, figsize:tuple=(3,3), title:Optional[str]=None, hide_axis:bool=True,
     color:str='white', **kwargs):
     "Show the `ImageBBox` on `ax`."
