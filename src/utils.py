@@ -240,7 +240,7 @@ def class_indices_by_index(class_indices, index):
 #     return trans(tensor.data)
 #
 def pil2np(img:PIL.Image):
-    return numpy.array(img)
+    return np.array(img)
 
 def open_image_pil(fname:str)->PIL.Image:
     return PIL.Image.open(fname)
