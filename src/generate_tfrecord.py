@@ -5,7 +5,10 @@ It is modified to generate TF Records from a slightly different CSV file.
 Preparation (run outside of IPython)
   pip install -r ..\requirements.txt
   git clone --depth=1 --quiet https://github.com/tensorflow/models.git models
-  download /data from gcs
+  download /data from gcs (you need to install Google Cloud SDK and set proxy for gcloud/gsutil)
+    gsutil cp gs://id-norm/train-merged.csv .
+    gsutil cp gs://id-norm/valid-merged.csv .
+    gsutil cp -r gs://id-norm/data .
 
 Usage:
   # From tensorflow/models/
@@ -167,10 +170,10 @@ def create_tf_example(group, path):
         show(x=image,
              y=(
                 (
-                    (row['bbox1_x1'], row['bbox1_x2'], row['bbox1_y1'], row['bbox1_y2'])
+                    (row['bbox1_x1'], row['bbox1_x2'], row['bbox1_y1'], row['bbox1_y2']),
                 ),
                 (
-                    row['label']
+                    row['label'],
                 )
                )
             )
