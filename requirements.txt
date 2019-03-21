@@ -1,0 +1,5 @@
+pandas
+matplotlib
+Pillow
+typing
+# tensorflow==1.13

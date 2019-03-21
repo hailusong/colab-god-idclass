@@ -2,6 +2,11 @@
 This file is based on https://github.com/datitran/raccoon_dataset/blob/master/generate_tfrecord.pyself.
 It is modified to generate TF Records from a slightly different CSV file.
 
+Preparation (run outside of IPython)
+  pip install -r ..\requirements.txt
+  git clone --depth=1 --quiet https://github.com/tensorflow/models.git models
+  download /data from gcs
+
 Usage:
   # From tensorflow/models/
   # Create train data:
@@ -18,8 +23,25 @@ import os
 import io
 import pandas as pd
 import tensorflow as tf
+import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
+from utils import *
 
 from PIL import Image
+
+#for type annotations
+from typing import Any, AnyStr, Callable, Collection, Dict, Hashable, Iterator, List, Mapping, NewType, Optional
+from typing import Sequence, Tuple, TypeVar, Union
+
+try:
+    get_ipython
+except:
+    import sys
+    DEFAULT_HOME = 'c:\\Users\\ksong\\github'
+    print(f'appending {DEFAULT_HOME} to Python sys path')
+    sys.path.append(f'{DEFAULT_HOME}/models/research')
+    sys.path.append(f'{DEFAULT_HOME}/models/research/slim')
+
 from object_detection.utils import dataset_util
 from collections import namedtuple, OrderedDict
 
@@ -50,6 +72,55 @@ LABEL_MAP = {
     "ON-HC": 2,
     "UNKNOWN": 3
 }
+
+
+def ifnone(a:Any,b:Any)->Any:
+    "`a` if `a` is not None, otherwise `b`."
+    return b if a is None else a
+
+
+def _draw_outline(o:Patch, lw:int):
+    "Outline bounding box onto image `Patch`."
+    o.set_path_effects([patheffects.Stroke(
+        linewidth=lw, foreground='black'), patheffects.Normal()])
+
+
+def _draw_rect(ax:plt.Axes, b:Collection[int], color:str='white', text=None, text_size=14):
+    "Draw bounding box on `ax`."
+    patch = ax.add_patch(patches.Rectangle(b[:2], *b[-2:], fill=False, edgecolor=color, lw=2))
+    _draw_outline(patch, 4)
+    if text is not None:
+        patch = ax.text(*b[:2], text, verticalalignment='top', color=color, fontsize=text_size, weight='bold')
+        _draw_outline(patch,1)
+
+
+def show_image(img:PIL.Image, ax:plt.Axes=None, figsize:tuple=(3,3), hide_axis:bool=True, cmap:str='binary',
+                alpha:float=None, **kwargs)->plt.Axes:
+    "Display `Image` in notebook."
+    if ax is None: fig,ax = plt.subplots(figsize=figsize)
+    ax.imshow(pil2np(img), cmap=cmap, alpha=alpha, **kwargs)
+    if hide_axis: ax.axis('off')
+    return ax
+
+
+def show_bbox(y=None, ax:plt.Axes=None, figsize:tuple=(3,3), title:Optional[str]=None, hide_axis:bool=True,
+    color:str='white', **kwargs):
+    "Show the `ImageBBox` on `ax`."
+    if ax is None: _,ax = plt.subplots(figsize=figsize)
+    bboxes, lbls = y
+    for i, bbox in enumerate(bboxes):
+        if lbls is not None: text = str(lbls[i])
+        else: text=None
+        _draw_rect(ax, bb2hw(bbox), text=text, color=color)
+
+
+def show(ax:plt.Axes=None, figsize:tuple=(3,3), title:Optional[str]=None, hide_axis:bool=True,
+          cmap:str=None, x:PIL.Image=None, y:Any=None, **kwargs):
+    "Show image on `ax` with `title`, using `cmap` if single-channel, overlaid with optional `y`"
+    # cmap = ifnone(cmap, defaults.cmap)
+    ax = show_image(x, ax=ax, hide_axis=hide_axis, cmap=cmap, figsize=figsize)
+    if y is not None: show_bbox(ax=ax, y=y, **kwargs)
+    if title is not None: ax.set_title(title)
 
 
 # TO-DO replace this with label map
@@ -88,6 +159,17 @@ def create_tf_example(group, path):
         x2 = row['bbox1_x2'] / width
         y1 = row['bbox1_y1'] / height
         y2 = row['bbox1_y2'] / height
+        show(x=image,
+             y=(
+                (
+                    (row['bbox1_x1'], row['bbox1_x2'], row['bbox1_y1'], row['bbox1_y2'])
+                ),
+                (
+                    row['label']
+                )
+               )
+            )
+
         valid_rec = (valid_range_min < x1 <  valid_range_max and
                      valid_range_min < x2 <  valid_range_max and
                      valid_range_min < y1 <  valid_range_max and
