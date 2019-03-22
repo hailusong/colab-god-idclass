@@ -27,6 +27,7 @@ import io
 import pandas as pd
 import tensorflow as tf
 import matplotlib.pyplot as plt
+from matplotlib import patches
 from matplotlib.patches import Patch
 from utils import *
 
