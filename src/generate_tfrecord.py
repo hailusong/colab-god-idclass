@@ -130,6 +130,7 @@ def show(ax:plt.Axes=None, figsize:tuple=(3,3), title:Optional[str]=None, hide_a
     ax = show_image(x, ax=ax, hide_axis=hide_axis, cmap=cmap, figsize=figsize)
     if y is not None: show_bbox(ax=ax, y=y, **kwargs)
     if title is not None: ax.set_title(title)
+    plt.show()
 
 
 # TO-DO replace this with label map
@@ -168,16 +169,16 @@ def create_tf_example(group, path):
         x2 = row['bbox1_x2'] / width
         y1 = row['bbox1_y1'] / height
         y2 = row['bbox1_y2'] / height
-        show(x=image,
-             y=(
-                (
-                    (row['bbox1_x1'], row['bbox1_x2'], row['bbox1_y1'], row['bbox1_y2']),
-                ),
-                (
-                    row['label'],
-                )
-               )
-            )
+        # show(x=image,
+        #      y=(
+        #         (
+        #             (row['bbox1_x1'], row['bbox1_x2'], row['bbox1_y1'], row['bbox1_y2']),
+        #         ),
+        #         (
+        #             row['label'],
+        #         )
+        #        )
+        #     )
 
         valid_rec = (valid_range_min < x1 <  valid_range_max and
                      valid_range_min < x2 <  valid_range_max and
@@ -195,8 +196,6 @@ def create_tf_example(group, path):
         classes_text.append(row['label'].encode('utf8'))
         classes.append(class_text_to_int(row['label']))
 
-    print(f'total invalid record count is {invalid_cnt}')
-
     tf_example = tf.train.Example(features=tf.train.Features(feature={
         'image/height': dataset_util.int64_feature(height),
         'image/width': dataset_util.int64_feature(width),
@@ -211,6 +210,7 @@ def create_tf_example(group, path):
         'image/object/class/text': dataset_util.bytes_list_feature(classes_text),
         'image/object/class/label': dataset_util.int64_list_feature(classes),
     }))
+
     return tf_example
 
 
