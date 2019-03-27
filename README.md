@@ -7,10 +7,10 @@
 
 ## Information
 1. god_idclass_gcs.ipynb
-  - Setup GCS for Google Object Detection API custom training
+    - Setup GCS for Google Object Detection API custom training
 2. god_idclass_colabtrain.ipynb
-  - Train Google Object Detection API with custom data and pipeline configuration on CoLab
+    - Train Google Object Detection API with custom data and pipeline configuration on CoLab
 3. god_idclass_mlabtrain.ipynb
-  - Train Google Object Detection API with custom data and pipeline configuration on Google Cloud ML
+    - Train Google Object Detection API with custom data and pipeline configuration on Google Cloud ML
 4. god_idclass_export.ipynb
-  - Export the custom train result, a checkpoint model of Google Object Detection API, for inference
+    - Export the custom train result, a checkpoint model of Google Object Detection API, for inference
