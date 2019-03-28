@@ -14,3 +14,8 @@
     - Train Google Object Detection API with custom data and pipeline configuration on Google Cloud ML
 4. god_idclass_export.ipynb
     - Export the custom train result, a checkpoint model of Google Object Detection API, for inference
+5. god_idclass_colabeval.ipynb
+    - object detection inference using exported model
+    - note that in **the legacy Google Object Detection API**, you need to run **train** and **eval** at the same time in separated processes
+    - in the **newer Google Object Detection API** (>=1.13.1), it is one run (via **model_main/py** or TPU version) and trigger **BOTH train/eval** at the same time
+    - In **tensorboard**, all **metrics** are on **Valid dataset**, **NOT** on **Train dataset**, including **IMAGEs**
