@@ -4,6 +4,8 @@
 1. Github: https://github.com/hailusong/models/blob/master/research/object_detection/samples/configs
 2. The one we use is **faster_rcnn_resnet101_pets.config**
     - See [this](https://gitlab.com/hailusong/openhack-ml-2018/blob/master/arctiq-ml-2018/readme.MD#the-how-to-train-in-details) about Google Object API custom training
+3. Details about the pipeline.config as well as protobuf
+    - See [3 steps to update parameters of Faster R-CNN/SSD models in TensorFlow Object Detection API](https://towardsdatascience.com/3-steps-to-update-parameters-of-faster-r-cnn-ssd-models-in-tensorflow-object-detection-api-7eddb11273ed)
 
 ## Information
 1. god_idclass_gcs.ipynb
