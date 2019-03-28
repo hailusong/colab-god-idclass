@@ -19,3 +19,19 @@
     - note that in **the legacy Google Object Detection API**, you need to run **train** and **eval** at the same time in separated processes
     - in the **newer Google Object Detection API** (>=1.13.1), it is one run (via **model_main/py** or TPU version) and trigger **BOTH train/eval** at the same time
     - In **tensorboard**, all **metrics** are on **Valid dataset**, **NOT** on **Train dataset**, including **IMAGEs**
+
+### Inference with Frozen Graph
+1. Load frozen Graph
+    - Create Graph object
+    - Create Graph Definition object
+    - Load frozen graph using Graph Definition object
+    - Import Graph Definition object into Graph object
+2. Locate all tensors/ops we need:
+    - Image input tensor/op: **image_tensor:0**
+    - Output tensor/op: **detection_boxes**
+    - Output tensor/op: **detection_masks**
+    - Output tensor/op: **num_detections**
+3. Compute the graph within **a TF session**
+    - Set the **session input dict (a.k.a. feed_dict)** to the image to be inferenced
+    - From the **session output dict** (a.k.a. session output) fetch values from those tensors
+    - Plot the result
