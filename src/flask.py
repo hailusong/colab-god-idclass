@@ -19,6 +19,10 @@ from object_detection.utils import visualization_utils as vis_util
 import time
 import numpy as np
 
+import zlib
+import lz4
+from lz4 import frame
+
 # What model to use in GCS
 # MODEL_NAME = 'ssd_mobilenet_v1_coco_2017_11_17'
 # MODEL_FILE = MODEL_NAME + '.tar.gz'
