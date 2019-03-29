@@ -9,6 +9,7 @@ from werkzeug.serving import WSGIRequestHandler
 
 WSGIRequestHandler.protocol_version = 'HTTP/1.1'
 
+import PIL
 from PIL import Image as PIL_Image
 import ujson
 
