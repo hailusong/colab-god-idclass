@@ -64,6 +64,10 @@ def load_model():
     return detection_graph, category_index
 
 
+# load inference model at the beginning of the app
+detection_graph = load_model()
+
+
 def run_inference_for_single_image(image, graph):
     with graph.as_default():
         with tf.Session() as sess:
@@ -138,7 +142,7 @@ def inference():
         arr = np.array(data['img']).astype(np.uint8)
         # print(f'{arr.shape}')
         pil_im = PIL.Image.fromarray(arr)
-        detection_api_input_im = load_image_into_numpy_array(pil_im)
+        image_np = load_image_into_numpy_array(pil_im)
 
         # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
         image_np_expanded = np.expand_dims(image_np, axis=0)
