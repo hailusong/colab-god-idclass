@@ -24,6 +24,10 @@ import zlib
 import lz4
 from lz4 import frame
 
+import tensorflow as tf
+print(tf.__version__)
+assert(tf.__version__.startswith(TF_RT_VERSION + '.')), f'tf.__version__ {tf.__version__} not matching with specified TF runtime version env variable {TF_RT_VERSION}'
+
 # What model to use in GCS
 # MODEL_NAME = 'ssd_mobilenet_v1_coco_2017_11_17'
 # MODEL_FILE = MODEL_NAME + '.tar.gz'
