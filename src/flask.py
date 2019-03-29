@@ -22,6 +22,7 @@ import numpy as np
 # MODEL_NAME = 'ssd_mobilenet_v1_coco_2017_11_17'
 # MODEL_FILE = MODEL_NAME + '.tar.gz'
 # DOWNLOAD_BASE = 'http://download.tensorflow.org/models/object_detection/'
+YOUR_GCS_BUCKET = 'id-norm'
 
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
 PATH_TO_FROZEN_GRAPH = f'gs://{YOUR_GCS_BUCKET}/exported_graphs/frozen_inference_graph.pb'
