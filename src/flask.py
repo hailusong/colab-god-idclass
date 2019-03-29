@@ -71,7 +71,7 @@ def load_model():
 
 
 # load inference model at the beginning of the app
-detection_graph = load_model()
+detection_graph, _ = load_model()
 
 
 def run_inference_for_single_image(image, graph):
