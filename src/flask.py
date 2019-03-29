@@ -25,6 +25,8 @@ import lz4
 from lz4 import frame
 
 import tensorflow as tf
+
+TF_RT_VERSION='1.13'
 print(tf.__version__)
 assert(tf.__version__.startswith(TF_RT_VERSION + '.')), f'tf.__version__ {tf.__version__} not matching with specified TF runtime version env variable {TF_RT_VERSION}'
 
