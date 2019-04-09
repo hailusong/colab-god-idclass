@@ -25,7 +25,7 @@
     - in the **newer Google Object Detection API** (>=1.13.1), it is one run (via **model_main/py** or TPU version) and trigger **BOTH train/eval** at the same time
     - In **tensorboard**, all **metrics** are on **Valid dataset**, **NOT** on **Train dataset**, including **IMAGEs**
 6. god_idclass_flask.ipynb
-  - Run inference as a REST service in Flask
+    - Run inference as a REST service in Flask
 
 ### Inference with Frozen Graph
 1. Load frozen Graph
