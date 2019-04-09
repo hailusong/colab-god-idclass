@@ -159,14 +159,14 @@ def inference():
         # confidence threshold is 0.8
         indic = np.argmax(output_dict['detection_scores'])
         if output_dict['detection_scores'][indic] >= 0.8:
-            bboxes = [output_dict['detection_boxes'][indic], ]
-            classes = [output_dict['detection_classes'][indic], ]
+            bboxes = output_dict['detection_boxes'][indic]
+            classes = output_dict['detection_classes'][indic]
 
     duration2 = time.time() - start
     print(f'executime time breakdown: {round(duration1, 2)}, ' +
           f'+{round(duration2-duration1, 2)}')
 
-    return ujson.dumps({'bboxes': bboxes.tolist(), 'classes': classes.tolist()})
+    return ujson.dumps({'bboxes': [bboxes.tolist(), ], 'classes': [classes.tolist(), ]})
 
 
 @app.route("/")
