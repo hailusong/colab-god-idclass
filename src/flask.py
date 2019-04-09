@@ -142,7 +142,8 @@ def inference():
     # data = ujson.loads(lz4framed.decompress(request.get_data()).decode('utf-8'))
     duration1 = time.time() - start
 
-    bboxes, classes = np.array([]), np.array([])
+    # bboxes, classes = np.array([]), np.array([])
+    bboxes, classes = [], []
 
     if 'img' in data:
         arr = np.array(data['img']).astype(np.uint8)
@@ -159,14 +160,16 @@ def inference():
         # confidence threshold is 0.8
         indic = np.argmax(output_dict['detection_scores'])
         if output_dict['detection_scores'][indic] >= 0.8:
-            bboxes = output_dict['detection_boxes'][indic]
-            classes = output_dict['detection_classes'][indic]
+            # bboxes = output_dict['detection_boxes'][indic]
+            # classes = output_dict['detection_classes'][indic]
+            bboxes.append(output_dict['detection_boxes'][indic].tolist())
+            classes.append(output_dict['detection_classes'][indic].tolist())
 
     duration2 = time.time() - start
     print(f'executime time breakdown: {round(duration1, 2)}, ' +
           f'+{round(duration2-duration1, 2)}')
 
-    return ujson.dumps({'bboxes': [bboxes.tolist(), ], 'classes': [classes.tolist(), ]})
+    return ujson.dumps({'bboxes': bboxes, 'classes': classes})
 
 
 @app.route("/")
