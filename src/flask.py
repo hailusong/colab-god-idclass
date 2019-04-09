@@ -160,9 +160,13 @@ def inference():
         # confidence threshold is 0.8
         indic = np.argmax(output_dict['detection_scores'])
         if output_dict['detection_scores'][indic] >= 0.8:
+            # according to https://github.com/tensorflow/models/blob/master/research/object_detection/utils/visualization_utils.py
+            # ymin, xmin, ymax, xmax = box
+            # ------------------------------
             # bboxes = output_dict['detection_boxes'][indic]
             # classes = output_dict['detection_classes'][indic]
-            bboxes.append(output_dict['detection_boxes'][indic].tolist())
+            pred_bbox = output_dict['detection_boxes'][indic]
+            bboxes.append(pred_bbox[[1, 0, 3, 2]].tolist())
             classes.append(output_dict['detection_classes'][indic].tolist())
 
     duration2 = time.time() - start
