@@ -36,11 +36,13 @@ assert(tf.__version__.startswith(TF_RT_VERSION + '.')), f'tf.__version__ {tf.__v
 # DOWNLOAD_BASE = 'http://download.tensorflow.org/models/object_detection/'
 YOUR_GCS_BUCKET = 'id-norm'
 
+MODEL_NAME = 'ssd_mobilenet_v2'
+
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
-PATH_TO_FROZEN_GRAPH = f'gs://{YOUR_GCS_BUCKET}/exported_graphs/frozen_inference_graph.pb'
+PATH_TO_FROZEN_GRAPH = f'gs://{YOUR_GCS_BUCKET}/exported_graphs_{MODEL_NAME}/frozen_inference_graph.pb'
 
 # List of the strings that is used to add correct label for each box.
-PATH_TO_LABELS = f'gs://{YOUR_GCS_BUCKET}/data/label_map.pbtxt'
+PATH_TO_LABELS = f'gs://{YOUR_GCS_BUCKET}/data_{MODEL_NAME}/label_map.pbtxt'
 
 app = Flask(__name__)
 run_with_ngrok(app)  # Start ngrok when app is run
