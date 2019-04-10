@@ -7,6 +7,9 @@
 3. Details about the pipeline.config as well as protobuf
     - See [3 steps to update parameters of Faster R-CNN/SSD models in TensorFlow Object Detection API](https://towardsdatascience.com/3-steps-to-update-parameters-of-faster-r-cnn-ssd-models-in-tensorflow-object-detection-api-7eddb11273ed)
 
+## Dlib
+See [src/dlib](src/dlib)
+
 ## Information
 1. god_idclass_gcs_model.ipynb
     - Setup GCS detection model for Google Object Detection API custom training
