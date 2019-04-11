@@ -14,7 +14,7 @@ Two shape predictor models (available [here](https://github.com/davisking/dlib-m
       <?xml version='1.0' encoding='ISO-8859-1'?>
       <?xml-stylesheet type='text/xsl' href='image_metadata_stylesheet.xsl'?>
       <dataset>
-      <name>iBUG face point dataset - training images</name>
+      <name>...</name>
       <comment>...</comment>
       <images>
         <image file='lfpw/trainset/image_0457.png'>
@@ -39,6 +39,14 @@ Two shape predictor models (available [here](https://github.com/davisking/dlib-m
     - labels_ibug_300W_test.xml
     - See **train.xml** above for the format
 
-## Notes
-1. Convert pnts-\*.csv and bbox-\*.csv to dlib XML format
-2. Train with dlib
+## CSV2XML
+1. to generate training XML
+
+  ```
+  python dlib\generate_dlibxml.py generate ..\generated\bbox-train-* ..\generated\dlib_train.xml
+  ```
+2. to generate validation XML
+
+  ```
+  python dlib\generate_dlibxml.py generate ..\generated\bbox-valid-* ..\generated\dlib_test.xml
+  ```
