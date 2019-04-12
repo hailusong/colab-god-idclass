@@ -17,34 +17,42 @@ XML_EPILOGUE = \
 
 XML_IMAGE_PROLOGUE = \
     "  <image file='{0}'>\n" + \
-    "    <box top='{1}' left='{2}' width='{3}' height='{4}'>"
+    "    <box top='{1}' left='{2}' height='{3}' width='{4}'>"
 
 XML_IMAGE_EPILOGUE = "    </box>\n  </image>"
 
 XML_PNTS = "      <part name='{0}' x='{1}' y='{2}'/>"
 
 
-def bbox_to_xml(img_fn:str, bbox_row):
+def bbox_to_xml(img_fn:str, bbox_row)->str:
     """
         bbox_row is Dataframe row
         {
         'top': bbox_row['bbox1_y1'],
         'left': bbox_row['bbox1_x1'],
-        'width': bbox_row['bbox1_x2'] - bbox_row['bbox1_x1'] + 1,
-        'height': bbox_row['bbox1_y2'] - bbox_row['bbox1_y1'] + 1
+        'height': bbox_row['bbox1_y2'] - bbox_row['bbox1_y1'] + 1,
+        'width': bbox_row['bbox1_x2'] - bbox_row['bbox1_x1'] + 1
         }
     """
     return XML_IMAGE_PROLOGUE.format(
             img_fn,
             bbox_row['bbox1_y1'],
             bbox_row['bbox1_x1'],
-            bbox_row['bbox1_x2'] - bbox_row['bbox1_x1'] + 1,
-            bbox_row['bbox1_y2'] - bbox_row['bbox1_y1'] + 1
+            bbox_row['bbox1_y2'] - bbox_row['bbox1_y1'] + 1,
+            bbox_row['bbox1_x2'] - bbox_row['bbox1_x1'] + 1
         )
 
 
-def pnts_to_xml(bbox_row, pnts_row):
+def pnts_to_xml(bbox_row, pnts_row)->list:
     """ pnts_row is Dataframe row with columns x1,y1,x2,y2,x3,y3,x4,y4 """
+    assert(bbox_row['bbox1_y2'] >= pnts_row['y1'] >= bbox_row['bbox1_y1'] and
+           bbox_row['bbox1_x2'] >= pnts_row['x1'] >= bbox_row['bbox1_x1'] and
+           bbox_row['bbox1_y2'] >= pnts_row['y2'] >= bbox_row['bbox1_y1']  and
+           bbox_row['bbox1_x2'] >= pnts_row['x2'] >= bbox_row['bbox1_x1']), \
+           f"Points out-of-range: {pnts_row['y1']}/{pnts_row['x1']} " + \
+           f"not within {bbox_row['bbox1_y1']}/{bbox_row['bbox1_x1']} - " + \
+           f"{bbox_row['bbox1_y2']}/{bbox_row['bbox1_x2']}"
+
     base_x, base_y = bbox_row['bbox1_x1'], bbox_row['bbox1_y1']
 
     return [
@@ -70,11 +78,11 @@ def random_shift(bbox_row):
     top, left = bbox_row['bbox1_y1'], bbox_row['bbox1_x1']
     bottom, right = bbox_row['bbox1_y2'], bbox_row['bbox1_x2']
     img_height, img_width = 256, 256
-    assert(img_height > top >= 0 and
-           img_width > left >= 0 and
-           img_height > bottom >= 0  and
-           img_width > right >= 0), \
-           f'Out-of-range: {top}/{left}, {bottom}/{right} not within {img_height}/{img_width}'
+    assert(img_height >= top >= 0 and
+           img_width >= left >= 0 and
+           img_height >= bottom >= 0  and
+           img_width >= right >= 0), \
+           f'BBox out-of-range: {top}/{left}, {bottom}/{right} not within {img_height}/{img_width}'
 
     random_max = 32
     random_val1 = random.randint(0, random_max)
@@ -82,17 +90,12 @@ def random_shift(bbox_row):
     random_val3 = random.randint(0, random_max)
     random_val4 = random.randint(0, random_max)
 
-    top = max(0, top - random_val1)
-    left = max(0, left - random_val2)
-    bottom = min(img_height, bottom + random_val3)
-    right = min(img_width, right + random_val4)
+    top_shift = min(random_val1, top)
+    left_shift = min(random_val2, left)
+    bottom_shift = min(img_height - bottom, random_val3)
+    right_shift = min(img_width - right,random_val4)
 
-    bbox_row['bbox1_y1'] = top
-    bbox_row['bbox1_x1'] = left
-    bbox_row['bbox1_y2'] = bottom
-    bbox_row['bbox1_x2'] = right
-
-    return bbox_row
+    return [top_shift, left_shift, bottom_shift, right_shift]
 
 # create new method for pd.DataFrame
 # pd.DataFrame.to_xml = to_xml

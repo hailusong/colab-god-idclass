@@ -16,7 +16,14 @@ class DlibGenerator:
 
         xml_buff = []
         for index, bbox_row in bbox_pd.iterrows():
-            random_shift(bbox_row)
+            # return is [top_shift, left_shift, bottom_shift, right_shift]
+            shifts = random_shift(bbox_row)
+
+            # update bbox_row
+            bbox_row['bbox1_y1'] -= shifts[0]
+            bbox_row['bbox1_x1'] -= shifts[1]
+            bbox_row['bbox1_y2'] += shifts[2]
+            bbox_row['bbox1_x2'] += shifts[3]
 
             # bbox_row has been updated by adding some randomness
             pnts_row = pnts_pd.loc[index, :]
