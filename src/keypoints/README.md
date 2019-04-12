@@ -43,10 +43,10 @@ Two shape predictor models (available [here](https://github.com/davisking/dlib-m
 1. to generate training XML
 
   ```
-  python dlib\generate_dlibxml.py generate ..\generated\bbox-train-* ..\generated\dlib_train.xml
+  python dlib\generate_dlibxml.py generate ..\..\generated\bbox-train-* ..\..\generated\dlib_train.xml
   ```
 2. to generate validation XML
 
   ```
-  python dlib\generate_dlibxml.py generate ..\generated\bbox-valid-* ..\generated\dlib_test.xml
+  python dlib\generate_dlibxml.py generate ..\..\generated\bbox-valid-* ..\..\generated\dlib_test.xml
   ```
