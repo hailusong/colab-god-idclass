@@ -8,7 +8,7 @@ BBOX_PREFIX = 'bbox-'
 PNTS_PREFIX = 'pnts-'
 
 class DlibGenerator:
-    def _generate(self, bbox_file:str, pnts_file:str)->str:
+    def _generate(self, bbox_file:str, pnts_file:str, img_prefix:str=None)->str:
         print(f'working on {bbox_file} and {pnts_file}')
         bbox_pd = pd.read_csv(bbox_file).set_index('Unnamed: 0')
         pnts_pd = pd.read_csv(pnts_file).set_index('Unnamed: 0')
@@ -27,13 +27,13 @@ class DlibGenerator:
 
             # bbox_row has been updated by adding some randomness
             pnts_row = pnts_pd.loc[index, :]
-            xml = to_img_xml(index, bbox_row, pnts_row)
+            xml = to_img_xml(index, bbox_row, pnts_row, img_prefix)
             xml_buff.extend(xml)
 
         return xml_buff
 
 
-    def generate(self, bboxes_csv:str, xml_fn:str):
+    def generate(self, bboxes_csv:str, xml_fn:str, img_prefix:str=None):
         """
         generate dlib training/validation xml data based on bboxes and points CSV data.
         note that this function will infer points data filename (pnts-*.csv) from bboxes data filename (bbox-*.csv).
@@ -47,12 +47,15 @@ class DlibGenerator:
 
         xml_fn : str
             output XML filename
+
+        img_prefix : str
+            prefix should be inserted at the beginning of all image file pathes
         """
         xml_buffer = []
 
         for bbox_file in glob.glob(bboxes_csv, recursive=False):
             pnts_file = bbox_file.replace(BBOX_PREFIX, PNTS_PREFIX)
-            xml_buffer.extend(self._generate(bbox_file, pnts_file))
+            xml_buffer.extend(self._generate(bbox_file, pnts_file, img_prefix))
 
         full_xml = to_full_xml('idclass', f'data is for {xml_fn}', xml_buffer)
 

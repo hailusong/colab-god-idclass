@@ -1,4 +1,4 @@
-
+import os
 import pandas as pd
 import random
 
@@ -24,7 +24,7 @@ XML_IMAGE_EPILOGUE = "    </box>\n  </image>"
 XML_PNTS = "      <part name='{0}' x='{1}' y='{2}'/>"
 
 
-def bbox_to_xml(img_fn:str, bbox_row)->str:
+def bbox_to_xml(img_fn:str, bbox_row, img_prefix:str=None)->str:
     """
         bbox_row is Dataframe row
         {
@@ -35,7 +35,7 @@ def bbox_to_xml(img_fn:str, bbox_row)->str:
         }
     """
     return XML_IMAGE_PROLOGUE.format(
-            img_fn,
+            img_fn if img_prefix is None else os.path.join(img_prefix, img_fn),
             bbox_row['bbox1_y1'],
             bbox_row['bbox1_x1'],
             bbox_row['bbox1_y2'] - bbox_row['bbox1_y1'] + 1,
@@ -63,8 +63,8 @@ def pnts_to_xml(bbox_row, pnts_row)->list:
     ]
 
 
-def to_img_xml(index:str, bbox_row, pnts_row)->str:
-    bbox_xml = bbox_to_xml(index, bbox_row)
+def to_img_xml(index:str, bbox_row, pnts_row, img_prefix:str=None)->str:
+    bbox_xml = bbox_to_xml(index, bbox_row, img_prefix)
     pnts_xml = pnts_to_xml(bbox_row, pnts_row)
     return [bbox_xml, *pnts_xml, XML_IMAGE_EPILOGUE]
 
