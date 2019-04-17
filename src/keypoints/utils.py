@@ -53,7 +53,9 @@ def pnts_to_xml(bbox_row, pnts_row)->list:
            f"not within {bbox_row['bbox1_y1']}/{bbox_row['bbox1_x1']} - " + \
            f"{bbox_row['bbox1_y2']}/{bbox_row['bbox1_x2']}"
 
-    base_x, base_y = bbox_row['bbox1_x1'], bbox_row['bbox1_y1']
+    # points coordination are absolute, not relative to the bbox
+    # base_x, base_y = bbox_row['bbox1_x1'], bbox_row['bbox1_y1']
+    base_x, base_y = 0, 0
 
     return [
         XML_PNTS.format(0, pnts_row['x1'] - base_x, pnts_row['y1'] - base_y),
