@@ -25,6 +25,7 @@ import lz4
 from lz4 import frame
 
 import tensorflow as tf
+import dlib
 
 TF_RT_VERSION='1.13'
 print(tf.__version__)
@@ -56,7 +57,28 @@ def load_image_into_numpy_array(image):
       (im_height, im_width, -1))[:, :, :3].astype(np.uint8)
 
 
+def load_keypoints_model()->dlib.shape_predictor:
+    """
+    load train Dlib key points detection model
+    """
+    DEFAULT_HOME='/content'
+    id_keypoints_dat = f'{DEFAULT_HOME}/id_keypoints_dlib.dat'
+
+    return dlib.shape_predictor(id_keypoints_dat)
+
+
+def run_dlib_keypoints_inference(predictor:dlib.shape_predictor, im:PIL_Image, rect:list):
+    np_im = np.array(image, dtype=np.uint8)
+    box_left, box_top, box_width, box_height = rect
+    dlib_rect = dlib.rectangle(left=box_left, top=box_top, right=box_left + box_width - 1, bottom=box_top + box_height - 1)
+    shape = predictor(np_im, dlib_rect)
+    return shape
+
+
 def load_model():
+    """
+    import Google object detection model from GCS bucket directly
+    """
     detection_graph = tf.Graph()
 
     with detection_graph.as_default():
@@ -74,6 +96,7 @@ def load_model():
 
 # load inference model at the beginning of the app
 detection_graph, _ = load_model()
+dlib_shape_predictor = load_keypoints_model()
 
 
 def run_inference_for_single_image(image, graph):
@@ -145,7 +168,15 @@ def inference():
     duration1 = time.time() - start
 
     # bboxes, classes = np.array([]), np.array([])
-    bboxes, classes = [], []
+    #
+    #  |<---- image 1 ------>|, |<----- image 2 ----->|
+    # bboxes:
+    # [[(x1, y1, x2, y2), ...], ...]
+    # classes:
+    # [[class1, ...          ], [...], ...]
+    # keypoints:
+    # [[(x0, y0), (x, y1), ..], ...]
+    bboxes, classes, keypoints = [], [], []
 
     if 'img' in data:
         arr = np.array(data['img']).astype(np.uint8)
@@ -171,11 +202,15 @@ def inference():
             bboxes.append(pred_bbox[[1, 0, 3, 2]].tolist())
             classes.append(output_dict['detection_classes'][indic].tolist())
 
+            # run dlib key points detection
+            kpts = run_dlib_keypoints_inference(dlib_shape_predictor, image_np, (0, 0, 256, 256))
+            keypoints.append(keypoints)
+
     duration2 = time.time() - start
     print(f'executime time breakdown: {round(duration1, 2)}, ' +
           f'+{round(duration2-duration1, 2)}')
 
-    return ujson.dumps({'bboxes': bboxes, 'classes': classes})
+    return ujson.dumps({'bboxes': bboxes, 'classes': classes, 'keypoints': keypoints})
 
 
 @app.route("/")
