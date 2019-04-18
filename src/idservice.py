@@ -68,7 +68,7 @@ def load_keypoints_model()->dlib.shape_predictor:
 
 
 def run_dlib_keypoints_inference(predictor:dlib.shape_predictor, im:PIL_Image, rect:list):
-    np_im = np.array(image, dtype=np.uint8)
+    np_im = np.array(im, dtype=np.uint8)
     box_left, box_top, box_width, box_height = rect
     dlib_rect = dlib.rectangle(left=box_left, top=box_top, right=box_left + box_width - 1, bottom=box_top + box_height - 1)
     shape = predictor(np_im, dlib_rect)
