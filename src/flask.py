@@ -203,7 +203,7 @@ def inference():
             classes.append(output_dict['detection_classes'][indic].tolist())
 
             # run dlib key points detection
-            kpts = run_dlib_keypoints_inference(dlib_shape_predictor, image_np, (0, 0, 256, 256))
+            kpts = run_dlib_keypoints_inference(dlib_shape_predictor, image_np, pred_bbox[[1, 0, 3, 2]].tolist())
             keypoints.append(keypoints)
 
     duration2 = time.time() - start
