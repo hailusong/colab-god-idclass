@@ -179,12 +179,17 @@ def _inference(pil_im:PIL.Image):
         pred_class = output_dict['detection_classes'][indic].tolist()
 
         # run dlib key points detection
-        # note that dlib expects the bbox to be in image coordinates, not normalize (0 to 1)
-        pred_bbox_xfirst_abs = [int(i) for i in pred_bbox[[1, 0, 3, 2]] * pil_im.size[0]]
+        # note that dlib expects the bbox to be in image coordinates, not normalize (0 to 1).
+        # also we cannot assume image has the same width/height
+        pred_bbox_xfirst_abs = [
+            bboxes[0] * im.size[0],
+            bboxes[1] * im.size[1],
+            bboxes[2] * im.size[0],
+            bboxes[3] * im.size[1]]
         kpts = run_dlib_keypoints_inference(dlib_shape_predictor, image_np, pred_bbox_xfirst_abs)
-        return confidence, pred_bbox_xfirst, pred_class, kpts
+        return confidence, pred_bbox_xfirst, pred_bbox_xfirst_abs, pred_class, kpts
 
-    return confidence, [], [], []
+    return confidence, [], [], [], []
 
 
 @app.route("/predict", methods=['POST'])
@@ -219,7 +224,7 @@ def inference():
         # print(f'{arr.shape}')
         pil_im = PIL.Image.fromarray(arr)
 
-        confidence, pred_bbox_xfirst, pred_class, kpts = _inference(pil_im)
+        confidence, pred_bbox_xfirst, pred_bbox_xfirst_abs, pred_class, kpts = _inference(pil_im)
         if  confidence >= 0.8:
             bboxes.append(pred_bbox_xfirst)
             classes.append(pred_class)
