@@ -182,10 +182,10 @@ def _inference(pil_im:PIL.Image):
         # note that dlib expects the bbox to be in image coordinates, not normalize (0 to 1).
         # also we cannot assume image has the same width/height
         pred_bbox_xfirst_abs = [
-            pred_bbox_xfirst[0] * im.size[0],
-            pred_bbox_xfirst[1] * im.size[1],
-            pred_bbox_xfirst[2] * im.size[0],
-            pred_bbox_xfirst[3] * im.size[1]]
+            pred_bbox_xfirst[0] * pil_im.size[0],
+            pred_bbox_xfirst[1] * pil_im.size[1],
+            pred_bbox_xfirst[2] * pil_im.size[0],
+            pred_bbox_xfirst[3] * pil_im.size[1]]
         kpts = run_dlib_keypoints_inference(dlib_shape_predictor, image_np, pred_bbox_xfirst_abs)
         return confidence, pred_bbox_xfirst, pred_bbox_xfirst_abs, pred_class, kpts
 
