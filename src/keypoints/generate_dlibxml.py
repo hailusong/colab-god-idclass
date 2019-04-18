@@ -8,7 +8,8 @@ BBOX_PREFIX = 'bbox-'
 PNTS_PREFIX = 'pnts-'
 
 class DlibGenerator:
-    def _generate(self, bbox_file:str, pnts_file:str, img_prefix:str=None)->str:
+    def _generate(self, bbox_file:str, pnts_file:str,
+                  img_prefix:str=None, full_bbox:bool=False)->str:
         print(f'working on {bbox_file} and {pnts_file}')
         bbox_pd = pd.read_csv(bbox_file).set_index('Unnamed: 0')
         pnts_pd = pd.read_csv(pnts_file).set_index('Unnamed: 0')
@@ -16,14 +17,20 @@ class DlibGenerator:
 
         xml_buff = []
         for index, bbox_row in bbox_pd.iterrows():
-            # return is [top_shift, left_shift, bottom_shift, right_shift]
-            shifts = random_shift(bbox_row)
+            if full_bbox:
+                bbox_row['bbox1_y1'] = 0
+                bbox_row['bbox1_x1'] = 0
+                bbox_row['bbox1_y2'] = 255
+                bbox_row['bbox1_x2'] = 255
+            else:
+                # return is [top_shift, left_shift, bottom_shift, right_shift]
+                shifts = random_shift(bbox_row)
 
-            # update bbox_row
-            bbox_row['bbox1_y1'] -= shifts[0]
-            bbox_row['bbox1_x1'] -= shifts[1]
-            bbox_row['bbox1_y2'] += shifts[2]
-            bbox_row['bbox1_x2'] += shifts[3]
+                # update bbox_row
+                bbox_row['bbox1_y1'] -= shifts[0]
+                bbox_row['bbox1_x1'] -= shifts[1]
+                bbox_row['bbox1_y2'] += shifts[2]
+                bbox_row['bbox1_x2'] += shifts[3]
 
             # bbox_row has been updated by adding some randomness
             pnts_row = pnts_pd.loc[index, :]
@@ -33,7 +40,7 @@ class DlibGenerator:
         return xml_buff
 
 
-    def generate(self, bboxes_csv:str, xml_fn:str, img_prefix:str=None):
+    def generate(self, bboxes_csv:str, xml_fn:str, img_prefix:str=None, full_bbox:bool=False):
         """
         generate dlib training/validation xml data based on bboxes and points CSV data.
         note that this function will infer points data filename (pnts-*.csv) from bboxes data filename (bbox-*.csv).
@@ -50,12 +57,16 @@ class DlibGenerator:
 
         img_prefix : str
             prefix should be inserted at the beginning of all image file pathes
+
+        full_bbox : bool
+            Set to True if bbox ALWAYS set to the same as image.
+            Set to False if bbox data should come from the bboxes csv file.
         """
         xml_buffer = []
 
         for bbox_file in glob.glob(bboxes_csv, recursive=False):
             pnts_file = bbox_file.replace(BBOX_PREFIX, PNTS_PREFIX)
-            xml_buffer.extend(self._generate(bbox_file, pnts_file, img_prefix))
+            xml_buffer.extend(self._generate(bbox_file, pnts_file, img_prefix, full_bbox))
 
         full_xml = to_full_xml('idclass', f'data is for {xml_fn}', xml_buffer)
 
