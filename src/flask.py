@@ -72,7 +72,8 @@ def run_dlib_keypoints_inference(predictor:dlib.shape_predictor, im:PIL_Image, r
     box_left, box_top, box_width, box_height = rect
     dlib_rect = dlib.rectangle(left=box_left, top=box_top, right=box_left + box_width - 1, bottom=box_top + box_height - 1)
     shape = predictor(np_im, dlib_rect)
-    return shape
+
+    return [(shape.part(part_idx).x, shape.part(part_idx).y) for part_idx in range(shape.num_parts)]
 
 
 def load_model():
@@ -151,6 +152,39 @@ def run_inference_for_single_image(image, graph):
     return output_dict
 
 
+def _inference(pil_im:PIL.Image):
+    """
+    pil_im:
+        a PIL.Image for key points detection
+    """
+    image_np = load_image_into_numpy_array(pil_im)
+
+    # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+    image_np_expanded = np.expand_dims(image_np, axis=0)
+
+    # Actual detection.
+    output_dict = run_inference_for_single_image(image_np, detection_graph)
+
+    # confidence threshold is 0.8
+    indic = np.argmax(output_dict['detection_scores'])
+    confidence = output_dict['detection_scores'][indic]
+    if  confidence >= 0.8:
+        # according to https://github.com/tensorflow/models/blob/master/research/object_detection/utils/visualization_utils.py
+        # ymin, xmin, ymax, xmax = box
+        # ------------------------------
+        # bboxes = output_dict['detection_boxes'][indic]
+        # classes = output_dict['detection_classes'][indic]
+        pred_bbox = output_dict['detection_boxes'][indic]
+        pred_bbox_xfirst = pred_bbox[[1, 0, 3, 2]].tolist()
+        pred_class = output_dict['detection_classes'][indic].tolist()
+
+        # run dlib key points detection
+        kpts = run_dlib_keypoints_inference(dlib_shape_predictor, image_np, pred_bbox_xfirst)
+        return confidence, pred_bbox_xfirst, pred_class, kpts
+
+    return confidence, [], [], []
+
+
 @app.route("/predict", methods=['POST'])
 def inference():
     """
@@ -182,29 +216,12 @@ def inference():
         arr = np.array(data['img']).astype(np.uint8)
         # print(f'{arr.shape}')
         pil_im = PIL.Image.fromarray(arr)
-        image_np = load_image_into_numpy_array(pil_im)
 
-        # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
-        image_np_expanded = np.expand_dims(image_np, axis=0)
-
-        # Actual detection.
-        output_dict = run_inference_for_single_image(image_np, detection_graph)
-
-        # confidence threshold is 0.8
-        indic = np.argmax(output_dict['detection_scores'])
-        if output_dict['detection_scores'][indic] >= 0.8:
-            # according to https://github.com/tensorflow/models/blob/master/research/object_detection/utils/visualization_utils.py
-            # ymin, xmin, ymax, xmax = box
-            # ------------------------------
-            # bboxes = output_dict['detection_boxes'][indic]
-            # classes = output_dict['detection_classes'][indic]
-            pred_bbox = output_dict['detection_boxes'][indic]
-            bboxes.append(pred_bbox[[1, 0, 3, 2]].tolist())
-            classes.append(output_dict['detection_classes'][indic].tolist())
-
-            # run dlib key points detection
-            kpts = run_dlib_keypoints_inference(dlib_shape_predictor, image_np, pred_bbox[[1, 0, 3, 2]].tolist())
-            keypoints.append(keypoints)
+        confidence, pred_bbox_xfirst, pred_class, kpts = _inference(pil_im)
+        if  confidence >= 0.8:
+            bboxes.append(pred_bbox_xfirst)
+            classes.append(pred_class)
+            keypoints.append(kpts)
 
     duration2 = time.time() - start
     print(f'executime time breakdown: {round(duration1, 2)}, ' +
